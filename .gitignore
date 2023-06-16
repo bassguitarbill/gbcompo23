@@ -2,3 +2,5 @@
 *.gb
 *.map
 *.sym
+
+assets/*.bin

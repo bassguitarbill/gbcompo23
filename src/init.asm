@@ -45,6 +45,7 @@ CopyTilemap:
 	ld [rLCDC], a
 
 	; During the first (blank) frame, initialize display registers
+	; I guess this is the palette
 	ld a, %11100100
 	ld [rBGP], a
 
