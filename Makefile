@@ -1,5 +1,5 @@
 ASSEMBLER := rgbasm
-ASSEMBLER_FLAGS := -L
+ASSEMBLER_FLAGS := -L -H
 
 LINKER := rgblink
 

@@ -4,6 +4,12 @@ Tiles:
 	incbin "assets/text.bin"
 TilesEnd:
 
+SECTION "Window Tilemap", ROM0
+
+Text:
+	db "Hello, world!"
+TextEnd:	
+
 SECTION "Tilemap", ROM0
 
 Tilemap:
