@@ -3,6 +3,9 @@ SECTION "Tile data", ROM0
 Tiles:
 	incbin "assets/text.bin"
 TilesEnd:
+ObjectTiles:
+	incbin "assets/tiles.bin"
+ObjectTilesEnd:	
 
 SECTION "Window Tilemap", ROM0
 
@@ -32,3 +35,4 @@ Tilemap:
 	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,  0,0,0,0,0,0,0,0,0,0,0,0
 	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,  0,0,0,0,0,0,0,0,0,0,0,0
 TilemapEnd:
+	

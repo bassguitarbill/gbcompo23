@@ -7,7 +7,7 @@ FIXER := rgbfix
 FIXER_FLAGS := -v -p 0xFF
 
 GRAPHICS := rgbgfx
-GRAPHICS_FILES := assets/text.bin
+GRAPHICS_FILES := assets/text.bin assets/tiles.bin
 
 OBJECT_FILE := main.o
 SOURCE_FILE := src/main.asm

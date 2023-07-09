@@ -1,10 +1,17 @@
+SCREEN_HEIGHT EQU 18
+SCREEN_WIDTH  EQU 20
+	
 CONTROLS		EQU _HRAM + 0
 LAST_FRAME_CONTROLS	EQU _HRAM + 1
 FIRST_PRESSED_CONTROLS	EQU _HRAM + 2
+
+CURSOR_XPOS		EQU _HRAM + 3
+CURSOR_YPOS		EQU _HRAM + 4
 	
 SECTION "VBlank Handler", ROM0[$400]
 VBlankHandler:	
 	call ReadInput
+	call UpdateScreen
 	call DrawInput
 	reti
 
@@ -56,55 +63,77 @@ ReadInput:
 	ret
 
 DrawInput:
-	ld a, [CONTROLS]
-	ld b, a
-	ld a, $01
-	bit 7, b
-	jp nz, .drawIt
-	inc a
-	bit 6, b
-	jp nz, .drawIt
-	inc a
-	bit 5, b
-	jp nz, .drawIt
-	inc a
-	bit 4, b
-	jp nz, .drawIt
-	inc a
-	bit 3, b
-	jp nz, .drawIt
-	inc a
-	bit 2, b
-	jp nz, .drawIt
-	inc a
-	bit 1, b
-	jp nz, .drawIt
-	inc a
-	bit 0, b
-	jp nz, .drawIt
-	;; Don't draw sprite 0
-	xor a
-	ld [_OAMRAM], a
-	ret
-
-.drawIt:
-
-	
-	ld c, a
-
-	;; palette
 	ld a, %11100100
 	ld [$FF48], a
-
+	
 	ld HL, _OAMRAM
-	ld a, $18
+
+	ld a, [CURSOR_YPOS]
+	inc a
+	inc a
+	sla a
+	sla a
+	sla a
 	ldi [HL], a
-	ld a, $10
+
+	ld a, [CURSOR_XPOS]
+	inc a
+	sla a
+	sla a
+	sla a
 	ldi [HL], a
-	ld a, c
+
+	ld a, $00
 	ldi [HL], a
+
 	ld a, %00000000
 	ldi [HL], a
+
 	ret
+
+UpdateScreen:	
+	ld a, [FIRST_PRESSED_CONTROLS]
+	bit 7, a
+	jr nz, .moveDown
+	bit 6, a
+	jr nz, .moveUp
+	bit 5, a
+	jr nz, .moveLeft
+	bit 4, a
+	jr nz, .moveRight
+	jr .doneMoving
 	
+.moveDown:
+	ld a, [CURSOR_YPOS]
+	cp SCREEN_HEIGHT - 1
+	jr nc, .doneMoving
+	inc a
+	ld [CURSOR_YPOS], a
+	jr .doneMoving
+
+.moveUp:
+	ld a, [CURSOR_YPOS]
+	cp 0
+	jr z, .doneMoving
+	dec a
+	ld [CURSOR_YPOS], a
+	jr .doneMoving
+
+.moveRight:
+	ld a, [CURSOR_XPOS]
+	cp SCREEN_WIDTH - 1
+	jr z, .doneMoving
+	inc a
+	ld [CURSOR_XPOS], a
+	jr .doneMoving
+
+.moveLeft:
+	ld a, [CURSOR_XPOS]
+	cp 0
+	jr z, .doneMoving
+	dec a
+	ld [CURSOR_XPOS], a
+	jr .doneMoving
 	
+.doneMoving:
+	ret
