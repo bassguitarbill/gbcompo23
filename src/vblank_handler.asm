@@ -87,10 +87,33 @@ AnimateDot:
 	
 	ld a, [DOT_ANIMATION_FRAME] ; If we are on frame 4, that's enough animation
 	cp 4
-	ret z
+	jr z, .affixDot
 	inc a			; If we're not yet on frame 4, advance the frame
 	ld [DOT_ANIMATION_FRAME], a
 
+	ret
+.affixDot:
+	ld a, [DOT_YPOS]
+	sra a
+	sra a
+	sra a
+	ld b, $98
+	add b
+	ld h, a
+	
+	ld a, [DOT_YPOS]
+	sla a
+	sla a
+	sla a
+	sla a
+	sla a
+	ld b, a
+	ld a, [DOT_XPOS]
+	add b
+	ld l, a
+
+	ld a, $02
+	ld [HL], a
 	ret
 	
 PlaceDot:
