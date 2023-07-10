@@ -114,12 +114,20 @@ AnimateDot:
 
 	ld a, $02
 	ld [HL], a
+
+	ld a, -1
+	ld [DOT_ANIMATION_PROGRESS], a
+
 	ret
 	
 PlaceDot:
 	ld a, [FIRST_PRESSED_CONTROLS]
 	bit 0, a
 	ret z
+
+	ld a, [DOT_ANIMATION_PROGRESS]
+	cp -1
+	ret nz
 
 	ld a, [CURSOR_XPOS]
 	ld [DOT_XPOS], a
