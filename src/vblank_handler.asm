@@ -1,5 +1,7 @@
 SCREEN_HEIGHT EQU 18
 SCREEN_WIDTH  EQU 20
+
+ANIMATION_FRAME_LENGTH EQU 8
 	
 CONTROLS		EQU _HRAM + 0
 LAST_FRAME_CONTROLS	EQU _HRAM + 1
@@ -7,12 +9,20 @@ FIRST_PRESSED_CONTROLS	EQU _HRAM + 2
 
 CURSOR_XPOS		EQU _HRAM + 3
 CURSOR_YPOS		EQU _HRAM + 4
+
+DOT_XPOS		EQU _HRAM + 5
+DOT_YPOS		EQU _HRAM + 6
+DOT_ANIMATION_PROGRESS	EQU _HRAM + 7
+DOT_ANIMATION_FRAME	EQU _HRAM + 8	
 	
 SECTION "VBlank Handler", ROM0[$400]
 VBlankHandler:	
 	call ReadInput
 	call UpdateScreen
-	call DrawInput
+	call PlaceDot
+	call AnimateDot
+	call DrawCursor
+	call DrawDot
 	reti
 
 ReadInput:
@@ -62,7 +72,43 @@ ReadInput:
 	ld [CONTROLS], a
 	ret
 
-DrawInput:
+AnimateDot:	
+	ld a, [DOT_ANIMATION_PROGRESS]
+	cp -1			; -1 is a sentinel value, the dot is not set
+	ret z
+
+	dec a			; Timer counts down by 1
+	ld [DOT_ANIMATION_PROGRESS], a
+	dec a
+	ret nz ; If the timer has reached 0, advance the animation
+
+	ld a, ANIMATION_FRAME_LENGTH	; If we advance the animation, set the timer back to 5
+	ld [DOT_ANIMATION_PROGRESS], a
+	
+	ld a, [DOT_ANIMATION_FRAME] ; If we are on frame 4, that's enough animation
+	cp 4
+	ret z
+	inc a			; If we're not yet on frame 4, advance the frame
+	ld [DOT_ANIMATION_FRAME], a
+
+	ret
+	
+PlaceDot:
+	ld a, [FIRST_PRESSED_CONTROLS]
+	bit 0, a
+	ret z
+
+	ld a, [CURSOR_XPOS]
+	ld [DOT_XPOS], a
+	ld a, [CURSOR_YPOS]
+	ld [DOT_YPOS], a
+	ld a, ANIMATION_FRAME_LENGTH 
+	ld [DOT_ANIMATION_PROGRESS], a
+	xor a
+	ld [DOT_ANIMATION_FRAME], a
+	ret
+
+DrawCursor:
 	ld a, %11100100
 	ld [$FF48], a
 	
@@ -84,6 +130,33 @@ DrawInput:
 	ldi [HL], a
 
 	ld a, $00
+	ldi [HL], a
+
+	ld a, %00000000
+	ldi [HL], a
+
+	ret
+
+DrawDot:
+	ld HL, _OAMRAM + 4
+
+	ld a, [DOT_YPOS]
+	inc a
+	inc a
+	sla a
+	sla a
+	sla a
+	ldi [HL], a
+
+	ld a, [DOT_XPOS]
+	inc a
+	sla a
+	sla a
+	sla a
+	ldi [HL], a
+
+	ld a, [DOT_ANIMATION_FRAME]
+	inc a
 	ldi [HL], a
 
 	ld a, %00000000

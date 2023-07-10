@@ -86,6 +86,10 @@ ClearOAM:
 	ldi [HL], a
 	dec b
 	jr nz, ClearOAM
+
+	;; clear dot RAM
+	ld a, -1
+	ld [DOT_ANIMATION_PROGRESS], a
 	
 	; Enable the interrupt handler
 	ld a, $0F
